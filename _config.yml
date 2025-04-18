@@ -1,0 +1,5 @@
+title: My Blog
+description: A simple blog using Jekyll and GitHub Actions
+baseurl: "/blog" 
+url: "https://sverrham.github.io"
+theme: minima
