@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DDR4 estimated and realistic bandwidth - My Blog</title>
+  <link rel="stylesheet" href="/blog/assets/css/style.css">
+  <link rel="icon" href="/blog/assets/images/favicon.ico">
+</head>
+<body>
+  <header>
+    <h1><a href="/blog/">My Blog</a></h1>
+    <p>A simple blog using Jekyll and GitHub Actions</p>
+  </header>
+
+  <main>
+    <h1>DDR4 estimated and realistic bandwidth</h1>
+<p><em>May 16, 2025</em></p>
+<p>Recently I was working on a design using a DDR memory chip and I wanted to use it as a buffer for a video stream. I needed to run 4kp60 video through the memory, so we would need approximately <code class="language-plaintext highlighter-rouge">12 Gbit</code> write and <code class="language-plaintext highlighter-rouge">12 Gbit</code> read.</p>
+
+<p>The design had a ddr4 module connected with 16bit bus and could run it at 1066Mhz resulting in a theoretical bandwidth <code class="language-plaintext highlighter-rouge">1066*2*16 = 34.112Gbit/s</code>.</p>
+
+<p>Now for the design we needed about <code class="language-plaintext highlighter-rouge">~25 Gbit</code> bandwidth, and so I wondered is this possible to achieve?</p>
+
+<p>I remembered someone once told me you can probably achieve <code class="language-plaintext highlighter-rouge">3/4</code> of the maximum theoretical bandwidth in a standard design.
+So now I was thinking with <code class="language-plaintext highlighter-rouge">3/4</code> we should be able to do <code class="language-plaintext highlighter-rouge">25.584 Gb/s</code> which should be just enough for what we need.</p>
+
+<p>Also I wondered what speeds could we theoretically achieve.</p>
+
+<p>So to get the answers I made some prototype code to gather the info. 
+The design was just a simple generator generating data that is written to memory and a verification unit that read out the data and checked the data for correctness.</p>
+
+<p>The prototype design could continuously write a “video frame” and read the data out in a one to one fashion where a read was triggered by the write. It was also possible to continuously write only or continuously read only.
+The design was not optimized for trying to mach up read and write so to achieve better hit with paging and so on in the memory.
+So a quite straight forward design to test what we could achieve.</p>
+
+<h2 id="results">Results</h2>
+<p>For the read/write test we got a similar rate on read and write, which makes sense since one read was triggered by one write, the resulting read write rate achieved was <code class="language-plaintext highlighter-rouge">12.6 Gb/s</code> resulting in a total bandwidth of <code class="language-plaintext highlighter-rouge">25.2 Gb/s</code>. This sums up to a utilization at <code class="language-plaintext highlighter-rouge">75.7%</code> which is right at the <code class="language-plaintext highlighter-rouge">3/4</code> that one could accept so this seems like a plausible and expected result for the memory with a straight forward read/write design.</p>
+
+<p>When testing read only I achieved a result of about <code class="language-plaintext highlighter-rouge">26.7 Gb/s</code> resulting in a utilization at about <code class="language-plaintext highlighter-rouge">80%</code>.</p>
+
+<p>When testing write only I achieved a result of about <code class="language-plaintext highlighter-rouge">23.9 Gb/s</code> resulting in a utilization at about <code class="language-plaintext highlighter-rouge">71%</code>
+I expect the write result is from the write source and that the generating module generated data with natural spacing in the stream, so the write part was probably not optimal for maximum write rate to memory but when interleaved with read gave a good utilization.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>So with the simple tests it seems like <code class="language-plaintext highlighter-rouge">3/4</code> bandwidth. 
+And with a possible bandwidth of <code class="language-plaintext highlighter-rouge">12.6 Gb/S</code> read/write it should be possible to achieve the datarate needed.</p>
+
+  </main>
+
+  <footer>
+    <p>© 2025 My Blog</p>
+  </footer>
+</body>
+</html>
