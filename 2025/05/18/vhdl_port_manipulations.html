@@ -1,4 +1,21 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.4">Jekyll</generator><link href="https://sverrham.github.io/blog/feed.xml" rel="self" type="application/atom+xml" /><link href="https://sverrham.github.io/blog/" rel="alternate" type="text/html" /><updated>2025-05-18T19:07:08+00:00</updated><id>https://sverrham.github.io/blog/feed.xml</id><title type="html">My Blog</title><subtitle>A simple blog using Jekyll and GitHub Actions</subtitle><entry><title type="html">VHDL portmap signal manipulations</title><link href="https://sverrham.github.io/blog/2025/05/18/vhdl_port_manipulations.html" rel="alternate" type="text/html" title="VHDL portmap signal manipulations" /><published>2025-05-18T00:00:00+00:00</published><updated>2025-05-18T00:00:00+00:00</updated><id>https://sverrham.github.io/blog/2025/05/18/vhdl_port_manipulations</id><content type="html" xml:base="https://sverrham.github.io/blog/2025/05/18/vhdl_port_manipulations.html"><![CDATA[<p>I recently needed to change typ of some signals going in to a vhdl module, and had some issues with some functions not working and some did.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VHDL portmap signal manipulations - My Blog</title>
+  <link rel="stylesheet" href="/blog/assets/css/style.css">
+  <link rel="icon" href="/blog/assets/images/favicon.ico">
+</head>
+<body>
+  <header>
+    <h1><a href="/blog/">My Blog</a></h1>
+    <p>A simple blog using Jekyll and GitHub Actions</p>
+  </header>
+
+  <main>
+    <h1>VHDL portmap signal manipulations</h1>
+<p><em>May 18, 2025</em></p>
+<p>I recently needed to change typ of some signals going in to a vhdl module, and had some issues with some functions not working and some did.
 So I wanted to go through what I can do and what I can’t do when manipulating signals mapped in a portmap of an entity in vhdl.
 So I did some tests and at least you can do these things when compiling with vhdl-2008</p>
 
@@ -157,167 +174,12 @@ One can also access slices by ranging the outputs.</p>
   <span class="k">end</span> <span class="k">record</span><span class="p">;</span>
 
 <span class="k">end</span> <span class="k">package</span> <span class="n">test_pkg</span><span class="p">;</span>
-</code></pre></div></div>]]></content><author><name></name></author><summary type="html"><![CDATA[I recently needed to change typ of some signals going in to a vhdl module, and had some issues with some functions not working and some did. So I wanted to go through what I can do and what I can’t do when manipulating signals mapped in a portmap of an entity in vhdl. So I did some tests and at least you can do these things when compiling with vhdl-2008]]></summary></entry><entry><title type="html">DDR4 estimated and realistic bandwidth</title><link href="https://sverrham.github.io/blog/2025/05/16/ddr-speed.html" rel="alternate" type="text/html" title="DDR4 estimated and realistic bandwidth" /><published>2025-05-16T00:00:00+00:00</published><updated>2025-05-16T00:00:00+00:00</updated><id>https://sverrham.github.io/blog/2025/05/16/ddr-speed</id><content type="html" xml:base="https://sverrham.github.io/blog/2025/05/16/ddr-speed.html"><![CDATA[<p>Recently I was working on a design using a DDR memory chip and I wanted to use it as a buffer for a video stream. I needed to run 4kp60 video through the memory, so we would need approximately <code class="language-plaintext highlighter-rouge">12 Gbit</code> write and <code class="language-plaintext highlighter-rouge">12 Gbit</code> read.</p>
-
-<p>The design had a ddr4 module connected with 16bit bus and could run it at 1066Mhz resulting in a theoretical bandwidth <code class="language-plaintext highlighter-rouge">1066*2*16 = 34.112Gbit/s</code>.</p>
-
-<p>Now for the design we needed about <code class="language-plaintext highlighter-rouge">~25 Gbit</code> bandwidth, and so I wondered is this possible to achieve?</p>
-
-<p>I remembered someone once told me you can probably achieve <code class="language-plaintext highlighter-rouge">3/4</code> of the maximum theoretical bandwidth in a standard design.
-So now I was thinking with <code class="language-plaintext highlighter-rouge">3/4</code> we should be able to do <code class="language-plaintext highlighter-rouge">25.584 Gb/s</code> which should be just enough for what we need.</p>
-
-<p>Also I wondered what speeds could we theoretically achieve.</p>
-
-<p>So to get the answers I made some prototype code to gather the info. 
-The design was just a simple generator generating data that is written to memory and a verification unit that read out the data and checked the data for correctness.</p>
-
-<p>The prototype design could continuously write a “video frame” and read the data out in a one to one fashion where a read was triggered by the write. It was also possible to continuously write only or continuously read only.
-The design was not optimized for trying to mach up read and write so to achieve better hit with paging and so on in the memory.
-So a quite straight forward design to test what we could achieve.</p>
-
-<h2 id="results">Results</h2>
-<p>For the read/write test we got a similar rate on read and write, which makes sense since one read was triggered by one write, the resulting read write rate achieved was <code class="language-plaintext highlighter-rouge">12.6 Gb/s</code> resulting in a total bandwidth of <code class="language-plaintext highlighter-rouge">25.2 Gb/s</code>. This sums up to a utilization at <code class="language-plaintext highlighter-rouge">75.7%</code> which is right at the <code class="language-plaintext highlighter-rouge">3/4</code> that one could accept so this seems like a plausible and expected result for the memory with a straight forward read/write design.</p>
-
-<p>When testing read only I achieved a result of about <code class="language-plaintext highlighter-rouge">26.7 Gb/s</code> resulting in a utilization at about <code class="language-plaintext highlighter-rouge">80%</code>.</p>
-
-<p>When testing write only I achieved a result of about <code class="language-plaintext highlighter-rouge">23.9 Gb/s</code> resulting in a utilization at about <code class="language-plaintext highlighter-rouge">71%</code>
-I expect the write result is from the write source and that the generating module generated data with natural spacing in the stream, so the write part was probably not optimal for maximum write rate to memory but when interleaved with read gave a good utilization.</p>
-
-<h2 id="conclusion">Conclusion</h2>
-<p>So with the simple tests it seems like <code class="language-plaintext highlighter-rouge">3/4</code> bandwidth. 
-And with a possible bandwidth of <code class="language-plaintext highlighter-rouge">12.6 Gb/S</code> read/write it should be possible to achieve the datarate needed.</p>]]></content><author><name></name></author><summary type="html"><![CDATA[Recently I was working on a design using a DDR memory chip and I wanted to use it as a buffer for a video stream. I needed to run 4kp60 video through the memory, so we would need approximately 12 Gbit write and 12 Gbit read.]]></summary></entry><entry><title type="html">VHDL Verilog mixed mode error</title><link href="https://sverrham.github.io/blog/2025/05/09/vhdl-verilog-issue.html" rel="alternate" type="text/html" title="VHDL Verilog mixed mode error" /><published>2025-05-09T00:00:00+00:00</published><updated>2025-05-09T00:00:00+00:00</updated><id>https://sverrham.github.io/blog/2025/05/09/vhdl-verilog-issue</id><content type="html" xml:base="https://sverrham.github.io/blog/2025/05/09/vhdl-verilog-issue.html"><![CDATA[<h1 id="vhdlverilog-questasim-error">VHDL/Verilog Questasim error</h1>
-
-<p>I had some issues with VCS where it was just totally failing my simulations, so I decided to simulate using Questasim to simulate my design.
-The design was a mix of VHDL and Verilog modules and compilation/simulation was controlled by the buildsystem at the company.
-Since the buildsystem vas configured and supported many simulators I thought there should be no issues changing simulator.
-Sadly this was not the case.
-Changing simulator was a quick line change in one file, but the result was error when trying to run the simulation.
-The VCOM and VLOG compile steps worked with no issues, but VSIM failed with an error message that did not tell me much.</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>** Fatal: Unexpected signal: 11.
 </code></pre></div></div>
 
-<p>Recreating the issue with some example code and testing with Questa Intel Starter FPGA Edition.64 2021.2 I get the following error message when trying to simulate the design.
-<code class="language-plaintext highlighter-rouge">vsim -voptargs="+acc" work.testb</code>
-With the resulting error:</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># ** Error (suppressible): testb.vhd(24): (vopt-1271) Bad default binding for component instance "u_testa: testa".
-#  (Component generic "TESTA" is not on the entity.)
-</code></pre></div></div>
+  </main>
 
-<p>This simulates a vhdl module that instantiate a verilog module.
-Vhdl module:</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>library ieee;
-use ieee.std_logic_1164.all;
-
-entity testb is
-end testb;
-
-architecture testb_arch of testb is
-  signal clk  : std_logic := '0';
-  signal outa : std_logic;
-
-  component testa is
-    generic (
-      TESTA : integer := 0
-    );
-    port (
-      clk  : in std_logic;
-      outa : out std_logic
-    );
-  end component;
-
-begin
-
-  u_testa : testa
-    generic map (
-      TESTA =&gt; 2
-    )
-    port map (
-      clk  =&gt; clk,
-      outa =&gt; outa 
-   );
-
-end architecture;
-</code></pre></div></div>
-
-<p>The verilog module is:</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>module testa #(parameter TESTA = 1)
-
-( 
-  input wire clk,
-  output logic  outa);
-
-always @(clk) begin
-  if (clk) begin
-    outa = 0;
-  end
-end
-
-endmodule
-</code></pre></div></div>
-
-<h3 id="compilation">Compilation</h3>
-<p>Verilog module:</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vlog -sv -lint -93 -work work .\testa.sv
-Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
-
-vlog -sv -lint -93 -work work .\testa.sv
--- Compiling module testa
-
-Top level modules:
-        testa
-
-Errors: 0, Warnings: 0
-</code></pre></div></div>
-
-<p>Vhdl module:</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vcom -2008 -lint -work ./work testb.vhd
-Questa Intel Starter FPGA Edition-64 vcom 2021.2 Compiler 2021.04 Apr 14 2021
-
-vcom -2008 -lint -work ./work testb.vhd
--- Loading package STANDARD
--- Loading package TEXTIO
--- Loading package std_logic_1164
--- Compiling entity testb
--- Compiling architecture testb_arch of testb
-
-Errors: 0, Warnings: 0
-</code></pre></div></div>
-
-<p>Then simulation:</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vsim -voptargs=+acc work.testb
-# vsim -voptargs="+acc" work.testb 
-
-# ** Note: (vsim-3812) Design is being optimized...
-# ** Error (suppressible): testb.vhd(24): (vopt-1271) Bad default binding for component instance "u_testa: testa".
-#  (Component generic "TESTA" is not on the entity.)
-# Optimization failed
-# ** Note: (vsim-12126) Error and warning message counts have been restored: Errors=1, Warnings=0.
-# Error loading design
-
-# Errors: 1, Warnings: 0
-</code></pre></div></div>
-
-<h3 id="the-issuesolution">The issue/solution</h3>
-
-<p>The issue was that the vlog command had the switch -93 set, from the help text for -93</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vlog -93 -help
-# Questa Intel Starter FPGA Edition-64 vlog 2021.2 Compiler 2021.04 Apr 14 2021
-# vlog options:
-# --------------------------------------------------------------------------------
-# -93                             Preserve the case of Verilog module (and
-#                                 parameter and port) names in the equivalent
-#                                 VHDL entity by using VHDL-1993 extended
-#                                 identifiers; this may be useful in
-#                                 mixed-language designs.
-</code></pre></div></div>
-
-<p>With this the simulation with a verilog module having parameters/generics made the simulation fail.</p>
-
-<p>For this simple example it is probably easy to see what is the issue, also the error message here was a bit clearer, not sure why it was different when I was working on the issue, could be different questasim version or other switches that might cause it to fail differently.</p>
-
-<p>This is one of those things you just have to work at and dig into to figure out.
-Issue for me working on this was that I was not familiar with the build system and 
-it was a big system that took some time to get into.</p>
-
-<p>Also the error message shown here <code class="language-plaintext highlighter-rouge">(Component generic "TESTA" is not on the entity.)</code> gives a lot more info than the message I got <code class="language-plaintext highlighter-rouge">Fatal: Unexpected signal: 11.</code></p>]]></content><author><name></name></author><summary type="html"><![CDATA[VHDL/Verilog Questasim error]]></summary></entry><entry><title type="html">Blog testing</title><link href="https://sverrham.github.io/blog/2025/04/18/welcome.html" rel="alternate" type="text/html" title="Blog testing" /><published>2025-04-18T00:00:00+00:00</published><updated>2025-04-18T00:00:00+00:00</updated><id>https://sverrham.github.io/blog/2025/04/18/welcome</id><content type="html" xml:base="https://sverrham.github.io/blog/2025/04/18/welcome.html"><![CDATA[<p>This is my first post to test this as an alternative.</p>]]></content><author><name></name></author><summary type="html"><![CDATA[This is my first post to test this as an alternative.]]></summary></entry></feed>
+  <footer>
+    <p>© 2025 My Blog</p>
+  </footer>
+</body>
+</html>
